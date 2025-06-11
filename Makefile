@@ -19,12 +19,17 @@ COM =\
 	components/keyboard_indicators\
 	components/keymap\
 	components/load_avg\
+	components/mm\
 	components/netspeeds\
+	components/nm\
 	components/num_files\
+	components/pa\
+	components/ppd\
 	components/ram\
 	components/run_command\
 	components/swap\
 	components/temperature\
+	components/upower\
 	components/uptime\
 	components/user\
 	components/volume\
@@ -36,13 +41,13 @@ $(COM:=.o): config.mk $(REQ:=.h) slstatus.h
 slstatus.o: slstatus.c slstatus.h arg.h config.h config.mk $(REQ:=.h)
 
 .c.o:
-	$(CC) -o $@ -c $(CPPFLAGS) $(CFLAGS) $<
+	$(CC) -o $@ -c $(CPPFLAGS) $(CFLAGS) $< -ggdb -O0
 
 config.h:
 	cp config.def.h $@
 
 slstatus: slstatus.o $(COM:=.o) $(REQ:=.o)
-	$(CC) -o $@ $(LDFLAGS) $(COM:=.o) $(REQ:=.o) slstatus.o $(LDLIBS)
+	$(CC) -o $@ $(LDFLAGS) $(COM:=.o) $(REQ:=.o) slstatus.o $(LDLIBS) -ggdb -O0
 
 clean:
 	rm -f slstatus slstatus.o $(COM:=.o) $(REQ:=.o) config.h slstatus-${VERSION}.tar.gz

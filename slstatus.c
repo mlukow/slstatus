@@ -24,6 +24,33 @@ static Display *dpy;
 #include "config.h"
 
 static void
+setup(void)
+{
+	mm_init();
+	nm_init();
+	pa_init();
+	ppd_init();
+	upower_init();
+}
+
+static void
+tick(void)
+{
+	nm_tick();
+	pa_tick();
+}
+
+static void
+teardown(void)
+{
+	mm_free();
+	nm_free();
+	pa_free();
+	ppd_free();
+	upower_free();
+}
+
+static void
 terminate(const int signo)
 {
 	if (signo != SIGUSR1)
@@ -82,7 +109,11 @@ main(int argc, char *argv[])
 	if (!sflag && !(dpy = XOpenDisplay(NULL)))
 		die("XOpenDisplay: Failed to open display");
 
+	setup();
+
 	do {
+		tick();
+
 		if (clock_gettime(CLOCK_MONOTONIC, &start) < 0)
 			die("clock_gettime:");
 
@@ -124,6 +155,8 @@ main(int argc, char *argv[])
 					die("nanosleep:");
 		}
 	} while (!done);
+
+	teardown();
 
 	if (!sflag) {
 		XStoreName(dpy, DefaultRootWindow(dpy), NULL);

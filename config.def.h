@@ -4,7 +4,7 @@
 const unsigned int interval = 1000;
 
 /* text to show if no value can be retrieved */
-static const char unknown_str[] = "n/a";
+static const char unknown_str[] = "";
 
 /* maximum output string length */
 #define MAXLEN 2048
@@ -66,5 +66,12 @@ static const char unknown_str[] = "n/a";
  */
 static const struct arg args[] = {
 	/* function format          argument */
-	{ datetime, "%s",           "%F %T" },
+	{ nm_line, " %s ", "enp0s20f0u2u4u3" },
+	{ nm_line, " %s ", "wlp2s0f0" },
+	{ keymap, " 󰌌 %s ", NULL },
+	{ pa_line, " %s ", NULL },
+	{ backlight_line, " %s ", "intel_backlight" },
+	{ upower_line, " %s ", "BAT0" },
+	{ ppd_line, " %s ", NULL },
+	{ datetime, "  %s", "%a %d %b %H:%M" },
 };

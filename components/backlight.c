@@ -8,6 +8,30 @@
 #include "../util.h"
 
 const char *
+backlight_line(const char *arg)
+{
+	char *icon;
+	const char *str_perc;
+	unsigned long perc;
+
+	if (!(str_perc = backlight_perc(arg)))
+		return NULL;
+
+	perc = strtoul(str_perc, NULL, 10);
+
+	if (perc < 25)
+		icon = "󰃞";
+	else if (perc < 50)
+		icon = "󰃟";
+	else if (perc < 75)
+		icon = "󰃝";
+	else
+		icon = "󰃠";
+
+	return bprintf("%s %d%%", icon, perc);
+}
+
+const char *
 backlight_icon(const char *arg)
 {
 	unsigned long perc;
