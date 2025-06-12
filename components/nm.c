@@ -1,5 +1,6 @@
 #include <NetworkManager.h>
 
+#include "../slstatus.h"
 #include "../queue.h"
 #include "../util.h"
 
@@ -129,8 +130,14 @@ nm_update(nm_t *nm)
 static void
 nm_signal_strength_callback(NMAccessPoint *ap, GParamSpec *pspec, gpointer user_data)
 {
+	int ss;
 	nm_t *nm = (nm_t *)user_data;
-	nm->ss = nm_access_point_get_strength(ap);
+
+	ss = nm_access_point_get_strength(ap);
+	if (ss != nm->ss) {
+		nm->ss = ss;
+		kill(getpid(), SIGRTMIN + NM_SIGNAL);
+	}
 }
 
 static void

@@ -1,13 +1,15 @@
 /* See LICENSE file for copyright and license details. */
 
+#include "slstatus.h"
+
 /* interval between updates (in ms) */
 const unsigned int interval = 1000;
 
 /* text to show if no value can be retrieved */
 static const char unknown_str[] = "";
 
-/* maximum output string length */
-#define MAXLEN 2048
+/* maximum command output length */
+#define CMDLEN 128
 
 /*
  * function            description                     argument (example)
@@ -65,13 +67,16 @@ static const char unknown_str[] = "";
  * wifi_perc           WiFi signal in percent          interface name (wlan0)
  */
 static const struct arg args[] = {
-	/* function format          argument */
-	{ nm_line, " %s ", "enp0s20f0u2u4u3" },
-	{ nm_line, " %s ", "wlp2s0f0" },
-	{ keymap, " 󰌌 %s ", NULL },
-	{ pa_line, " %s ", NULL },
-	{ backlight_line, " %s ", "intel_backlight" },
-	{ upower_line, " %s ", "BAT0" },
-	{ ppd_line, " %s ", NULL },
-	{ datetime, "  %s", "%a %d %b %H:%M" },
+	/* function				format    argument						turn	signal */
+	{ nm_line,				" %s ",		"enp0s20f0u2u4u3",	0,		NM_SIGNAL },
+	{ nm_line, 				" %s ",		"wlp2s0f0",					0, 		NM_SIGNAL },
+	{ keymap,					" 󰌌 %s ",	NULL,								1, 		-1 },
+	{ pa_line,				" %s ",		NULL, 							0, 		PA_SIGNAL },
+	{ backlight_line,	" %s ", 	"intel_backlight",	1, 		BACKLIGHT_SIGNAL },
+	{ upower_line,		" %s ", 	"BAT0",							0, 		UPOWER_SIGNAL },
+	{ ppd_line,				" %s ",		NULL,								0, 		PPD_SIGNAL },
+	{ datetime,				"  %s",	"%a %d %b %H:%M",		1, 		-1 },
 };
+
+ /* maximum output string length */
+ #define MAXLEN CMDLEN * LEN(args)

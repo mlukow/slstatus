@@ -1,7 +1,9 @@
 #include <string.h>
+#include <unistd.h>
 
 #include <pulse/pulseaudio.h>
 
+#include "../slstatus.h"
 #include "../queue.h"
 #include "../util.h"
 
@@ -47,12 +49,26 @@ pa_wait(pa_operation *op)
 void
 pa_sink_info_callback(pa_context *ctx, const pa_sink_info *info, int eol, void *userdata)
 {
+	int signal = 0;
+	int volume;
 	pa_t *pa = (pa_t *)userdata;
 
 	if (!eol && info) {
-		pa->index = info->index;
-		pa->volume = (int)(pa_cvolume_max(&info->volume) * 100.0f / PA_VOLUME_NORM + 0.5f);
-		pa->mute = info->mute;
+		if (info->index != pa->index) {
+			pa->index = info->index;
+			signal++;
+		}
+
+		volume = (int)(pa_cvolume_max(&info->volume) * 100.0f / PA_VOLUME_NORM + 0.5f);
+		if (volume != pa->volume) {
+			pa->volume = volume;
+			signal++;
+		}
+
+		if (info->mute != pa->mute) {
+			pa->mute = info->mute;
+			signal++;
+		}
 
 		if (pa->name)
 			free(pa->name);
@@ -62,6 +78,9 @@ pa_sink_info_callback(pa_context *ctx, const pa_sink_info *info, int eol, void *
 			free(pa->description);
 		pa->description = strdup(info->description);
 	}
+
+	if (signal)
+		kill(getpid(), SIGRTMIN + PA_SIGNAL);
 
 	pa_threaded_mainloop_signal(pa_loop, 0);
 }

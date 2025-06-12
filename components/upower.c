@@ -1,5 +1,6 @@
 #include <upower.h>
 
+#include "../slstatus.h"
 #include "../queue.h"
 #include "../util.h"
 
@@ -57,15 +58,25 @@ void
 upower_device_callback(UpDevice *device, GParamSpec *pspec, gpointer user_data)
 {
 	const gchar *name;
+	gdouble percentage;
+	UpDeviceState state;
 	upower_t *upower;
 
 	name = g_param_spec_get_name(pspec);
 	upower = (upower_t *)user_data;
 
 	if (!strcmp(name, "percentage")) {
-		 g_object_get(device, "percentage", &upower->percentage, NULL);
+		g_object_get(device, "percentage", &percentage, NULL);
+		if (percentage != upower->percentage) {
+			upower->percentage = percentage;
+			kill(getpid(), SIGRTMIN + UPOWER_SIGNAL);
+		}
 	} else if (!strcmp(name, "state")) {
-		g_object_get(device, "state", &upower->state, NULL);
+		g_object_get(device, "state", &state, NULL);
+		if (state != upower->state) {
+			upower->state = state;
+			kill(getpid(), SIGRTMIN + UPOWER_SIGNAL);
+		}
 	}
 }
 
@@ -98,6 +109,9 @@ upower_find(const char *device)
 	UpDevice *gdevice;
 	upower_t *upower;
 
+	if (!upower_client)
+		return NULL;
+
 	TAILQ_FOREACH(upower, &upower_queue, entry)
 		if (!strcmp(upower->device, device))
 			return upower;
@@ -113,11 +127,11 @@ upower_find(const char *device)
 			upower = calloc(1, sizeof(upower_t));
 			upower->device = device;
 
-			upower_update_from_device(upower, gdevice);
-
 			TAILQ_INSERT_TAIL(&upower_queue, upower, entry);
 
 			g_signal_connect(G_OBJECT(gdevice), "notify", G_CALLBACK(upower_device_callback), upower);
+
+			upower_update_from_device(upower, gdevice);
 
 			return upower;
 		}

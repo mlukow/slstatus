@@ -1,6 +1,10 @@
 /* See LICENSE file for copyright and license details. */
 
 /* backlight */
+#define BACKLIGHT_SIGNAL 1
+void backlight_init(void);
+void backlight_tick(void);
+void backlight_free(void);
 const char *backlight_line(const char *);
 const char *backlight_icon(const char *);
 const char *backlight_perc(const char *);
@@ -50,6 +54,7 @@ const char *keymap(const char *unused);
 const char *load_avg(const char *unused);
 
 /* mm */
+#define MM_SIGNAL 2
 void mm_init(void);
 void mm_tick(void);
 void mm_free(void);
@@ -61,6 +66,7 @@ const char *netspeed_rx(const char *interface);
 const char *netspeed_tx(const char *interface);
 
 /* nm */
+#define NM_SIGNAL 3
 void nm_init(void);
 void nm_free(void);
 void nm_tick(void);
@@ -83,6 +89,7 @@ const char *ram_used(const char *unused);
 const char *run_command(const char *cmd);
 
  /* pa */
+#define PA_SIGNAL 4
 void pa_init(void);
 void pa_tick(void);
 void pa_free(void);
@@ -93,6 +100,7 @@ const char *pa_name(const char *sink);
 const char *pa_perc(const char *sink);
 
 /* ppd */
+#define PPD_SIGNAL 5
 void ppd_init(void);
 void ppd_tick(void);
 void ppd_free(void);
@@ -109,6 +117,7 @@ const char *swap_used(const char *unused);
 const char *temp(const char *);
 
 /* upower */
+#define UPOWER_SIGNAL 6
 void upower_init(void);
 void upower_tick(void);
 void upower_free(void);

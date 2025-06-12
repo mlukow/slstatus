@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <libmm-glib.h>
 
+#include "../slstatus.h"
 #include "../queue.h"
 #include "../util.h"
 
@@ -40,7 +41,7 @@ mm_init(void)
 	if (!bus)
 		return;
 
-	mm_manager = mm_manager_new_sync (bus, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, NULL, NULL);
+	mm_manager = mm_manager_new_sync(bus, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, NULL, NULL);
 	if (!mm_manager)
 		return;
 
@@ -54,15 +55,25 @@ void
 mm_modem_callback(MMModem *modem, GParamSpec *pspec, gpointer user_data)
 {
 	const gchar *name;
+	guint sq;
 	mm_t *mm;
+	MMModemState state;
 
 	mm = (mm_t *)user_data;
 	name = g_param_spec_get_name(pspec);
 
 	if (!strcmp(name, "state")) {
-		g_object_get(modem, "state", &mm->state, NULL);
+		g_object_get(modem, "state", &state, NULL);
+		if (state != mm->state) {
+			mm->state = state;
+			kill(getpid(), SIGRTMIN + MM_SIGNAL);
+		}
 	} else if (!strcmp(name, "signal-quality")) {
-		g_object_get(modem, "signal-quality", &mm->sq, NULL);
+		g_object_get(modem, "signal-quality", &sq, NULL);
+		if (sq != mm->sq) {
+			mm->sq = sq;
+			kill(getpid(), SIGRTMIN + MM_SIGNAL);
+		}
 	}
 }
 

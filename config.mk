@@ -12,8 +12,8 @@ X11LIB = /usr/X11R6/lib
 
 # flags
 CPPFLAGS = -I$(X11INC) -D_DEFAULT_SOURCE -DVERSION=\"${VERSION}\" -DALSA
-CFLAGS   = -std=c99 -pedantic -Wall -Wextra -Wno-unused-parameter -Os `pkg-config --cflags libnm libpulse mm-glib upower-glib`
-LDFLAGS  = -L$(X11LIB) -s -lasound `pkg-config --libs libnm libpulse mm-glib upower-glib`
+CFLAGS   = -std=c99 -pedantic -Wall -Wextra -Wno-unused-parameter -Os `pkg-config --cflags libnm libpulse libudev mm-glib upower-glib`
+LDFLAGS  = -L$(X11LIB) -s -lasound `pkg-config --libs libnm libpulse libudev mm-glib upower-glib`
 # OpenBSD: add -lsndio
 # FreeBSD: add -lkvm -lsndio
 LDLIBS   = -lX11

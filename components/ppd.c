@@ -1,6 +1,7 @@
-#include <stdio.h>
 #include <gio/gio.h>
 #include <glib.h>
+
+#include "../slstatus.h"
 
 GDBusProxy *ppd_proxy = NULL;
 gchar *ppd_profile = NULL;
@@ -8,6 +9,7 @@ gchar *ppd_profile = NULL;
 void
 ppd_update(GDBusProxy *proxy)
 {
+	gchar *profile = NULL;
 	GVariant *tuple, *value;
 
 	tuple = g_dbus_proxy_call_sync(
@@ -20,11 +22,16 @@ ppd_update(GDBusProxy *proxy)
 			NULL);
 	if (tuple) {
 		g_variant_get(tuple, "(v)", &value);
-		if (ppd_profile)
-			free(ppd_profile);
-		ppd_profile = g_variant_dup_string(value, NULL);
+		profile = g_variant_dup_string(value, NULL);
 		g_variant_unref(value);
 		g_variant_unref(tuple);
+
+		if ((profile != ppd_profile) || (ppd_profile && strcmp(profile, ppd_profile))) {
+			if (ppd_profile)
+				free(ppd_profile);
+			ppd_profile = profile;
+			kill(getpid(), SIGRTMIN + PPD_SIGNAL);
+		}
 	}
 }
 
