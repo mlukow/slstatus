@@ -68,7 +68,7 @@ static const char unknown_str[] = "";
  */
 static const struct arg args[] = {
 	/* function				format    argument						turn	signal */
-	{ nm_line,				" %s ",		"enp0s20f0u2u4u3",	0,		NM_SIGNAL },
+	{ nm_line,				" %s ",		"enp0s20f0u4u4u3",	0,		NM_SIGNAL },
 	{ nm_line, 				" %s ",		"wlp2s0f0",					0, 		NM_SIGNAL },
 	{ keymap,					" 󰌌 %s ",	NULL,								1, 		-1 },
 	{ pa_line,				" %s ",		NULL, 							0, 		PA_SIGNAL },

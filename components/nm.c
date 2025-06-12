@@ -202,9 +202,8 @@ nm_find(const char *iface)
 			return nm;
 
 	device = nm_client_get_device_by_iface(nm_client, iface);
-	if (!device) {
+	if (!device)
 		return NULL;
-	}
 
 	nm = calloc(1, sizeof(nm_t));
 	nm->iface = strdup(iface);
