@@ -101,6 +101,7 @@ nm_update(nm_t *nm)
 				if (nm->ipv4)
 					free(nm->ipv4);
 				nm->ipv4 = strdup(nm_ip_address_get_address(g_ptr_array_index(addresses, 0)));
+				kill(getpid(), SIGRTMIN + NM_SIGNAL);
 			}
 		}
 
@@ -111,6 +112,7 @@ nm_update(nm_t *nm)
 				if (nm->ipv6)
 					free(nm->ipv6);
 				nm->ipv6 = strdup(nm_ip_address_get_address(g_ptr_array_index(addresses, 0)));
+				kill(getpid(), SIGRTMIN + NM_SIGNAL);
 			}
 		}
 	} else {
@@ -123,6 +125,8 @@ nm_update(nm_t *nm)
 			free(nm->ipv6);
 			nm->ipv6 = NULL;
 		}
+
+		kill(getpid(), SIGRTMIN + NM_SIGNAL);
 	}
 }
 
@@ -167,16 +171,20 @@ nm_access_point_callback(NMDeviceWifi *device, GParamSpec *pspec, gpointer user_
 				"notify::" NM_ACCESS_POINT_STRENGTH,
 				G_CALLBACK(nm_signal_strength_callback),
 				nm);
-	} else if (nm->ap) {
-			g_signal_handler_disconnect(nm->ap, nm->ss_id);
-			if (nm->essid) {
-				free(nm->essid);
-				nm->essid = NULL;
-			}
 
-			nm->ap = NULL;
-			nm->ss = 0;
-			nm->ss_id = 0;
+		kill(getpid(), SIGRTMIN + NM_SIGNAL);
+	} else if (nm->ap) {
+		g_signal_handler_disconnect(nm->ap, nm->ss_id);
+		if (nm->essid) {
+			free(nm->essid);
+			nm->essid = NULL;
+		}
+
+		nm->ap = NULL;
+		nm->ss = 0;
+		nm->ss_id = 0;
+
+		kill(getpid(), SIGRTMIN + NM_SIGNAL);
 	}
 }
 
