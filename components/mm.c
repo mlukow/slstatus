@@ -101,6 +101,7 @@ mm_find(const char *iface)
 				mm = calloc(1, sizeof(mm_t));
 				mm->iface = strdup(iface);
 				mm->modem = modem;
+				mm->state = mm_modem_get_state(modem);
 				mm->sq = mm_modem_get_signal_quality(modem, NULL);
 
 				TAILQ_INSERT_TAIL(&mm_queue, mm, entry);

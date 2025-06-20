@@ -1,6 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 #include <fcntl.h>
 #include <libudev.h>
+#include <limits.h>
 #include <pthread.h>
 #include <signal.h>
 #include <stdio.h>
@@ -32,6 +33,7 @@ backlight_t *
 backlight_find(const char *name, int create)
 {
 	backlight_t *backlight;
+	char path[PATH_MAX];
 	struct udev_device *device;
 
 	TAILQ_FOREACH(backlight, &backlight_queue, entry)
@@ -41,8 +43,11 @@ backlight_find(const char *name, int create)
 
 	if (!create)
 		return NULL;
+	
+	if (esnprintf(path, sizeof(path), BACKLIGHT_PATH, name) < 0)
+		return NULL;
 
-	device = udev_device_new_from_syspath(udev, "/sys/class/backlight/intel_backlight");
+	device = udev_device_new_from_syspath(udev, path);
 	if (!device)
 		return NULL;
 

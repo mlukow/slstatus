@@ -97,6 +97,8 @@ upower_update_from_device(upower_t *upower, UpDevice *device)
 			"state",
 			&upower->state,
 			NULL);
+
+	kill(getpid(), SIGRTMIN + UPOWER_SIGNAL);
 }
 
 upower_t *
