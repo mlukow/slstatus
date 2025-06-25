@@ -69,7 +69,7 @@ backlight_loop(void *arg)
 	struct udev_device *device;
 
 	udev_monitor = udev_monitor_new_from_netlink(udev, "udev");
-	// udev_monitor_filter_add_match_subsystem_devtype(udev_monitor, "backlight", NULL);
+	udev_monitor_filter_add_match_subsystem_devtype(udev_monitor, "backlight", NULL);
 	udev_monitor_enable_receiving(udev_monitor);
 
 	fd = udev_monitor_get_fd(udev_monitor);
