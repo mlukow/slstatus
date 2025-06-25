@@ -22,6 +22,7 @@ struct arg {
 char buf[1024];
 static unsigned int iter = 0;
 static int sflag = 0;
+static int Sflag = 0;
 static volatile sig_atomic_t done, upsigno;
 static Display *dpy;
 
@@ -70,7 +71,7 @@ difftimespec(struct timespec *res, struct timespec *a, struct timespec *b)
 static void
 usage(void)
 {
-	die("usage: %s [-v] [-s] [-1]", argv0);
+	die("usage: %s [-v] [-s] [-S] [-1]", argv0);
 }
 
 static void
@@ -93,20 +94,24 @@ printstatus(unsigned int iter)
 			break;
 	}
 
+	upsigno = 0;
+
 	status[0] = '\0';
 	for (i = 0; i < LEN(args); i++)
 		strcat(status, statuses[i]);
 	status[strlen(status)] = '\0';
 
-	if (sflag) {
-		puts(status);
-		fflush(stdout);
-		if (ferror(stdout))
-			die("puts:");
-	} else {
-		if (XStoreName(dpy, DefaultRootWindow(dpy), status) < 0)
-			die("XStoreName: Allocation failed");
-		XFlush(dpy);
+	if (Sflag || iter) {
+		if (sflag) {
+			puts(status);
+			fflush(stdout);
+			if (ferror(stdout))
+				die("puts:");
+		} else {
+			if (XStoreName(dpy, DefaultRootWindow(dpy), status) < 0)
+				die("XStoreName: Allocation failed");
+			XFlush(dpy);
+		}
 	}
 }
 
@@ -116,8 +121,7 @@ sighandler(const int signo)
 {
 	if ((signo <= SIGRTMAX && signo >= SIGRTMIN) || signo == SIGUSR1) {
 		upsigno = signo;
-		printstatus(iter);
-		errno = upsigno = 0;
+		errno = 0;
 	} else
 		done = 1;
 }
@@ -138,6 +142,9 @@ main(int argc, char *argv[])
 		/* FALLTHROUGH */
 	case 's':
 		sflag = 1;
+		break;
+	case 'S':
+		Sflag = 1;
 		break;
 	default:
 		usage();
