@@ -63,15 +63,22 @@ upower_device_callback(UpDevice *device, GParamSpec *pspec, gpointer user_data)
 	upower_t *upower;
 
 	name = g_param_spec_get_name(pspec);
-	upower = (upower_t *)user_data;
 
 	if (!strcmp(name, "percentage")) {
+		upower = (upower_t *)user_data;
+		if (!upower)
+			return;
+
 		g_object_get(device, "percentage", &percentage, NULL);
 		if (percentage != upower->percentage) {
 			upower->percentage = percentage;
 			kill(getpid(), SIGRTMIN + UPOWER_SIGNAL);
 		}
 	} else if (!strcmp(name, "state")) {
+		upower = (upower_t *)user_data;
+		if (!upower)
+			return;
+
 		g_object_get(device, "state", &state, NULL);
 		if (state != upower->state) {
 			upower->state = state;
@@ -131,9 +138,9 @@ upower_find(const char *device)
 
 			TAILQ_INSERT_TAIL(&upower_queue, upower, entry);
 
-			g_signal_connect(G_OBJECT(gdevice), "notify", G_CALLBACK(upower_device_callback), upower);
-
 			upower_update_from_device(upower, gdevice);
+
+			g_signal_connect(G_OBJECT(gdevice), "notify", G_CALLBACK(upower_device_callback), upower);
 
 			return upower;
 		}
